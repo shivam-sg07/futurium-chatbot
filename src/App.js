@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import IdleScreen from './components/IdleScreen';
 import GetStartedScreen from './components/GetStartedScreen';
 import ChatScreen from './components/ChatScreen';
+import ThankYouScreen from './components/ThankYouScreen';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         <Route path="/" element={<IdleScreen />} />
         <Route path="/get-started" element={<GetStartedScreen />} />
         <Route path="/chat" element={<ChatScreen />} />
+        <Route path="/thank-you" element={<ThankYouScreen />} />
       </Routes>
     </Router>
   );

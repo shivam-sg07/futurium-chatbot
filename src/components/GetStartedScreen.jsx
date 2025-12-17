@@ -33,10 +33,11 @@ function GetStartedScreen() {
           fontSize: '18px',
           cursor: 'pointer',
           zIndex: 10,
-          backgroundColor: '#4CAF50',
-          color: 'white',
+          backgroundColor: 'transparent',
+          color: 'transparent',
           border: 'none',
-          borderRadius: '5px'
+          borderRadius: '5px',
+          opacity: 0
         }}
       >
         Start Feedback

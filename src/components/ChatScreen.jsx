@@ -1,19 +1,45 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './ChatScreen.css';
+
+const questions = [
+  "WHAT DO YOU THINK ABOUT AGRI-PV?",
+  "WOULD YOU LIKE TO SEE AGRI-PV IN YOUR REGION?",
+  "DO YOU THINK AGRI-PV IS GOOD FOR FARMERS?",
+  "WOULD YOU SUPPORT AGRI-PV ON FARMLAND YOU KNOW?",
+  "WHAT BENEFITS DO YOU SEE IN COMBINING AGRICULTURE WITH SOLAR?",
+  "HOW DO YOU FEEL ABOUT MIXING FARMING AND SOLAR PANELS?",
+  "WHAT BENIFITS DO YOU EXPECT FROM AGRI-PV?",
+  "WHAT WORRIES YOU ABOUT AGRI-PV",
+  "WHAT SURPRISED YOU IN THIS EXHIBIT AND SIMULATIONS?",
+  "WHAT PART OF THIS DISPLAY INTERESTS YOU THE MOST?"
+];
 
 function ChatScreen() {
   const [messages, setMessages] = useState([]);
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [currentQuestion, setCurrentQuestion] = useState("What do you think about AGRI-PV?");
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const navigate = useNavigate();
   
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const messagesEndRef = useRef(null);
 
+  const currentQuestion = questions[questionIndex];
+
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' , block: 'nearest'});
   }, [messages]);
+
+  const handleNext = () => {
+    if (questionIndex < questions.length - 1) {
+      setQuestionIndex(questionIndex + 1);
+      setMessages([]); // Clear messages for new question
+    } else {
+      navigate('/thank-you'); // Navigate to thank you page after last question
+    }
+  };
 
   const startRecording = async () => {
     try {
@@ -203,6 +229,14 @@ function ChatScreen() {
           )}
         </button>
       </div>
+
+      {/* Next Button */}
+      <button 
+        className="next-button"
+        onClick={handleNext}
+      >
+        Next →
+      </button>
     </div>
   );
 }
