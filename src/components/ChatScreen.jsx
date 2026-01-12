@@ -3,16 +3,86 @@ import { useNavigate } from 'react-router-dom';
 import './ChatScreen.css';
 
 const questions = [
-  "WHAT DO YOU THINK ABOUT AGRI-PV?",
-  "WOULD YOU LIKE TO SEE AGRI-PV IN YOUR REGION?",
-  "DO YOU THINK AGRI-PV IS GOOD FOR FARMERS?",
-  "WOULD YOU SUPPORT AGRI-PV ON FARMLAND YOU KNOW?",
-  "WHAT BENEFITS DO YOU SEE IN COMBINING AGRICULTURE WITH SOLAR?",
-  "HOW DO YOU FEEL ABOUT MIXING FARMING AND SOLAR PANELS?",
-  "WHAT BENIFITS DO YOU EXPECT FROM AGRI-PV?",
-  "WHAT WORRIES YOU ABOUT AGRI-PV",
-  "WHAT SURPRISED YOU IN THIS EXHIBIT AND SIMULATIONS?",
-  "WHAT PART OF THIS DISPLAY INTERESTS YOU THE MOST?"
+  {
+    question: "WHAT DO YOU THINK ABOUT AGRI-PV?",
+    options: [
+      "I really like the idea!",
+      "I am skeptical!",
+      "Could you explain Agri-PV?"
+    ]
+  },
+  {
+    question: "WOULD YOU LIKE TO SEE AGRI-PV IN YOUR REGION?",
+    options: [
+      "I really like the idea!",
+      "I am skeptical!",
+      "Could you explain Agri-PV?"
+    ]
+  },
+  {
+    question: "DO YOU THINK AGRI-PV IS GOOD FOR FARMERS?",
+    options: [
+      "I really like the idea!",
+      "I am skeptical!",
+      "Could you explain Agri-PV?"
+    ]
+  },
+  {
+    question: "WOULD YOU SUPPORT AGRI-PV ON FARMLAND YOU KNOW?",
+    options: [
+      "I really like the idea!",
+      "I am skeptical!",
+      "Could you explain Agri-PV?"
+    ]
+  },
+  {
+    question: "WHAT BENEFITS DO YOU SEE IN COMBINING AGRICULTURE WITH SOLAR?",
+    options: [
+      "I really like the idea!",
+      "I am skeptical!",
+      "Could you explain Agri-PV?"
+    ]
+  },
+  {
+    question: "HOW DO YOU FEEL ABOUT MIXING FARMING AND SOLAR PANELS?",
+    options: [
+      "I really like the idea!",
+      "I am skeptical!",
+      "Could you explain Agri-PV?"
+    ]
+  },
+  {
+    question: "WHAT BENEFITS DO YOU EXPECT FROM AGRI-PV?",
+    options: [
+      "I really like the idea!",
+      "I am skeptical!",
+      "Could you explain Agri-PV?"
+    ]
+  },
+  {
+    question: "WHAT WORRIES YOU ABOUT AGRI-PV?",
+    options: [
+      "I really like the idea!",
+      "I am skeptical!",
+      "Could you explain Agri-PV?"
+    ]
+  },
+  {
+    question: "WHAT SURPRISED YOU IN THIS EXHIBIT AND SIMULATIONS?",
+    options: [
+      "I really like the idea!",
+      "I am skeptical!",
+      "Could you explain Agri-PV?"
+    ]
+  },
+  {
+    question: "WHAT PART OF THIS DISPLAY INTERESTS YOU THE MOST?",
+    options: [
+      "I really like the idea!",
+      "I am skeptical!",
+      "Could you explain Agri-PV?"
+    ]
+  }
 ];
 
 function ChatScreen() {
@@ -20,6 +90,7 @@ function ChatScreen() {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [questionIndex, setQuestionIndex] = useState(0);
+  const [conversationStarted, setConversationStarted] = useState(false);
   const navigate = useNavigate();
   
   const mediaRecorderRef = useRef(null);
@@ -32,10 +103,23 @@ function ChatScreen() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' , block: 'nearest'});
   }, [messages]);
 
+  const handleOptionSelect = (option) => {
+    const userMessage = {
+      type: 'user',
+      text: option,
+      timestamp: new Date()
+    };
+    setMessages([userMessage]);
+    setConversationStarted(true);
+
+    sendToChatGPT(option, true);
+  };
+  
   const handleNext = () => {
     if (questionIndex < questions.length - 1) {
       setQuestionIndex(questionIndex + 1);
       setMessages([]); // Clear messages for new question
+      setConversationStarted(false);
     } else {
       navigate('/thank-you'); // Navigate to thank you page after last question
     }
@@ -84,13 +168,34 @@ function ChatScreen() {
       };
       setMessages(prev => [...prev, userMessage]);
 
-      sendToChatGPT(simulatedText);
+      sendToChatGPT(simulatedText, false);
     }, 1500);
   };
 
-  const sendToChatGPT = async (userText) => {
+  const sendToChatGPT = async (userText, isFirstMessage) => {
     try {
       const apiKey = process.env.REACT_APP_OPENAI_API_KEY || 'YOUR_OPENAI_API_KEY';
+      
+      const conversationHistory = [
+        {
+          role: 'system',
+          content: `You are a helpful assistant collecting feedback about Agri-PV technology. 
+                   The current question being discussed is: "${currentQuestion.question}".
+                   Keep responses concise and friendly.`
+        }
+      ];
+
+      messages.forEach(msg => {
+        conversationHistory.push({
+          role: msg.type === 'user' ? 'user' : 'assistant',
+          content: msg.text
+        });
+      });
+
+      conversationHistory.push({
+        role: 'user',
+        content: userText
+      });
       
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -100,16 +205,7 @@ function ChatScreen() {
         },
         body: JSON.stringify({
           model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'system',
-              content: 'You are a helpful assistant collecting feedback about Agri-PV technology. Keep responses concise and friendly.'
-            },
-            {
-              role: 'user',
-              content: userText
-            }
-          ],
+          messages: conversationHistory,
           max_tokens: 150
         })
       });
@@ -141,8 +237,26 @@ function ChatScreen() {
     <div className="chat-container">
       {/* Header */}
       <div className="chat-header">
-        <h1 className="chat-title">{currentQuestion}</h1>
+        <h1 className="chat-title">{currentQuestion.question}</h1>
       </div>
+
+      {/* default options if conversation hasn't started yet*/}
+      {!conversationStarted && (
+        <div className="options-container">
+          <div className="options-buttons">
+            {currentQuestion.options.map((option, index) => (
+              <button
+                key={index}
+                className="option-button"
+                onClick={() => handleOptionSelect(option)}
+                disabled={isProcessing}
+              >{option}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
 
       {/* Messages Area */}
       <div className="messages-container">
@@ -201,7 +315,8 @@ function ChatScreen() {
       </div>
 
       {/* Recording Button */}
-      <div className="recording-section">
+      {conversationStarted && (
+        <div className="recording-section">
         <button
           className={`record-button ${isRecording ? 'recording' : ''}`}
           onClick={isRecording ? stopRecording : startRecording}
@@ -229,7 +344,7 @@ function ChatScreen() {
           )}
         </button>
       </div>
-
+      )}
       {/* Next Button */}
       <button 
         className="next-button"
