@@ -358,11 +358,10 @@ html, body {
   border: none;
   border-radius: 40px;
   cursor: pointer;
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 600;
   font-family: 'FuturiumType', sans-serif;
   transition: all 0.3s ease;
-  box-shadow: 0 0 5px 10px rgba(255, 131, 67, 0.7);
   text-align: center; 
   flex: 1;
   max-width: 250px;
@@ -370,7 +369,7 @@ html, body {
 
 .option-button:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(255, 131, 67, 0.4);
+  box-shadow: 0 0 10px 10px rgba(255, 131, 67, 0.7);
 }
 
 .option-button:active {
