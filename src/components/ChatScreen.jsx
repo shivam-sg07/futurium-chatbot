@@ -226,7 +226,7 @@ function ChatScreen() {
   };
 
   return (
-    <div className="chat-container">
+    <div className={`chat-container ${!conversationStarted ? 'initial-state' : ''}`}>
       {/* Header */}
       <div className="chat-header">
         <h1 className="chat-title">{currentQuestion.question}</h1>
@@ -251,6 +251,7 @@ function ChatScreen() {
 
 
       {/* Messages Area */}
+      {conversationStarted && (
       <div className="messages-container">
         {messages.map((message, index) => (
           <div
@@ -301,7 +302,7 @@ function ChatScreen() {
         )}
 
         <div ref={messagesEndRef} />
-      </div>
+      </div>)}
 
       {/* Recording Button */}
       {conversationStarted && (
