@@ -198,12 +198,12 @@ html, body {
 }
 
 .user-bubble {
-  background: #E7F669;
-  color: #000000;
+  background: linear-gradient(135deg, #ff8343 0%, #eb9f48 100%);
+  color: #ffffff;
 }
 
 .bot-bubble {
-  background: #FDB842;
+  background: #1d5f27;
   color: #000000;
 }
 
@@ -287,7 +287,7 @@ html, body {
 
 .record-button {
   position: relative;
-  background: linear-gradient(135deg, #b1bace 0%, #000000 100%);
+  background: linear-gradient(135deg, #ff8343 0%, #eb9f48 100%);
   color: white;
   border: none;
   border-radius: 50%;
@@ -316,7 +316,7 @@ html, body {
 }
 
 .record-button.recording {
-  background: linear-gradient(135deg, #EF5350 0%, #F44336 100%);
+  background: linear-gradient(135deg, #ff8343 0%, #eb9f48 100%);
   animation: pulse-btn 1.5s ease-in-out infinite;
 }
 
@@ -353,7 +353,7 @@ html, body {
   align-items: center;
   justify-content: center;
   padding: 1rem 1.3rem;
-  background: linear-gradient(135deg, #ff8343 0%, #ffbf74 100%);
+  background: linear-gradient(135deg, #ff8343 0%, #eb9f48 100%);
   color: white;
   border: none;
   border-radius: 40px;
