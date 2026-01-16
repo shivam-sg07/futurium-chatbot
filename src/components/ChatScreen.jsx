@@ -266,21 +266,18 @@ function ChatScreen() {
             className={`message-wrapper ${message.type === 'user' ? 'user-message-wrapper' : 'bot-message-wrapper'}`}
           >
             {/* Avatar */}
-            <div className={`avatar ${message.type === 'user' ? 'user-avatar' : 'bot-avatar'}`}>
-              {message.type === 'user' ? (
-                <div className="avatar-icon user-icon">
-                  <div className="user-head"></div>
-                  <div className="user-body"></div>
-                </div>
-              ) : (
+              {message.type === 'bot' && (
+                <div className="avatar bot-avatar">
+                <div className="avatar-icon bot-avatar">
                 <div className="avatar-icon bot-icon">
                   <div className="bot-head">
                     <div className="bot-antenna"></div>
                     <div className="bot-face">🤖</div>
                   </div>
                 </div>
+                </div>
+              </div>
               )}
-            </div>
 
             {/* Message Bubble */}
             <div className={`message-bubble ${message.type === 'user' ? 'user-bubble' : 'bot-bubble'}`}>
