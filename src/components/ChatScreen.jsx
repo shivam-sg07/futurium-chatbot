@@ -14,23 +14,23 @@ const questions = [
   {
     question: "WOULD YOU LIKE TO SEE AGRI-PV IN YOUR REGION?",
     options: [
-      "I really like the idea!",
-      "I am skeptical!",
-      "Could you explain Agri-PV?"
+      "Yes, definitely!",
+      "Not sure yet!",
+      "Could you provide facts about Agri-PV?"
     ]
   },
   {
     question: "DO YOU THINK AGRI-PV IS GOOD FOR FARMERS?",
     options: [
-      "I really like the idea!",
-      "I am skeptical!",
+      "Yes, definitely!",
+      "Not sure yet!",
       "Could you explain Agri-PV?"
     ]
   },
   {
     question: "WOULD YOU SUPPORT AGRI-PV ON FARMLAND YOU KNOW?",
     options: [
-      "I really like the idea!",
+      "Yes, definitely!",
       "I am skeptical!",
       "Could you explain Agri-PV?"
     ]
@@ -38,8 +38,8 @@ const questions = [
   {
     question: "WHAT BENEFITS DO YOU SEE IN COMBINING AGRICULTURE WITH SOLAR?",
     options: [
-      "I really like the idea!",
-      "I am skeptical!",
+      "Many!",
+      "Not a lot!",
       "Could you explain Agri-PV?"
     ]
   },
@@ -52,34 +52,26 @@ const questions = [
     ]
   },
   {
-    question: "WHAT BENEFITS DO YOU EXPECT FROM AGRI-PV?",
-    options: [
-      "I really like the idea!",
-      "I am skeptical!",
-      "Could you explain Agri-PV?"
-    ]
-  },
-  {
     question: "WHAT WORRIES YOU ABOUT AGRI-PV?",
     options: [
-      "I really like the idea!",
-      "I am skeptical!",
+      "Nothing!",
+      "Quite a lot!",
       "Could you explain Agri-PV?"
     ]
   },
   {
     question: "WHAT SURPRISED YOU IN THIS EXHIBIT AND SIMULATIONS?",
     options: [
-      "I really like the idea!",
-      "I am skeptical!",
+      "Nothing!",
+      "Quite a lot!",
       "Could you explain Agri-PV?"
     ]
   },
   {
     question: "WHAT PART OF THIS DISPLAY INTERESTS YOU THE MOST?",
     options: [
-      "I really like the idea!",
-      "I am skeptical!",
+      "Nothing!",
+      "Quite a lot!",
       "Could you explain Agri-PV?"
     ]
   }
