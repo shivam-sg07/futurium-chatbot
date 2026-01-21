@@ -3,16 +3,78 @@ import { useNavigate } from 'react-router-dom';
 import './ChatScreen.css';
 
 const questions = [
-  "WHAT DO YOU THINK ABOUT AGRI-PV?",
-  "WOULD YOU LIKE TO SEE AGRI-PV IN YOUR REGION?",
-  "DO YOU THINK AGRI-PV IS GOOD FOR FARMERS?",
-  "WOULD YOU SUPPORT AGRI-PV ON FARMLAND YOU KNOW?",
-  "WHAT BENEFITS DO YOU SEE IN COMBINING AGRICULTURE WITH SOLAR?",
-  "HOW DO YOU FEEL ABOUT MIXING FARMING AND SOLAR PANELS?",
-  "WHAT BENIFITS DO YOU EXPECT FROM AGRI-PV?",
-  "WHAT WORRIES YOU ABOUT AGRI-PV",
-  "WHAT SURPRISED YOU IN THIS EXHIBIT AND SIMULATIONS?",
-  "WHAT PART OF THIS DISPLAY INTERESTS YOU THE MOST?"
+  {
+    question: "WHAT DO YOU THINK ABOUT AGRI-PV?",
+    options: [
+      "I really like the idea!",
+      "I am skeptical!",
+      "Could you explain Agri-PV?"
+    ]
+  },
+  {
+    question: "WOULD YOU LIKE TO SEE AGRI-PV IN YOUR REGION?",
+    options: [
+      "Yes, definitely!",
+      "Not sure yet!",
+      "Could you provide facts about Agri-PV?"
+    ]
+  },
+  {
+    question: "DO YOU THINK AGRI-PV IS GOOD FOR FARMERS?",
+    options: [
+      "Yes, definitely!",
+      "Not sure yet!",
+      "Could you explain Agri-PV?"
+    ]
+  },
+  {
+    question: "WOULD YOU SUPPORT AGRI-PV ON FARMLAND YOU KNOW?",
+    options: [
+      "Yes, definitely!",
+      "I am skeptical!",
+      "Could you explain Agri-PV?"
+    ]
+  },
+  {
+    question: "WHAT BENEFITS DO YOU SEE IN COMBINING AGRICULTURE WITH SOLAR?",
+    options: [
+      "Many!",
+      "Not a lot!",
+      "Could you explain Agri-PV?"
+    ]
+  },
+  {
+    question: "HOW DO YOU FEEL ABOUT MIXING FARMING AND SOLAR PANELS?",
+    options: [
+      "I really like the idea!",
+      "I am skeptical!",
+      "Could you explain Agri-PV?"
+    ]
+  },
+  {
+    question: "WHAT WORRIES YOU ABOUT AGRI-PV?",
+    options: [
+      "Nothing!",
+      "Quite a lot!",
+      "Could you explain Agri-PV?"
+    ]
+  },
+  {
+    question: "WHAT SURPRISED YOU IN THIS EXHIBIT AND SIMULATIONS?",
+    options: [
+      "Nothing!",
+      "Quite a lot!",
+      "Could you explain Agri-PV?"
+    ]
+  },
+  {
+    question: "WHAT PART OF THIS DISPLAY INTERESTS YOU THE MOST?",
+    options: [
+      "Nothing!",
+      "Quite a lot!",
+      "Could you explain Agri-PV?"
+    ]
+  }
 ];
 
 function ChatScreen() {
@@ -23,7 +85,8 @@ function ChatScreen() {
   const [debugInfo, setDebugInfo] = useState('');
   const [recordingTime, setRecordingTime] = useState(0);
   const [audioURL, setAudioURL] = useState(null);
-  const [showTest, setShowTest] = useState(true);
+  const [showTest, setShowTest] = useState(false); // Changed to false by default
+  const [conversationStarted, setConversationStarted] = useState(false);
   const navigate = useNavigate();
   
   const recorderRef = useRef(null);
@@ -47,6 +110,19 @@ function ChatScreen() {
     };
   }, []);
 
+  const handleOptionSelect = (option) => {
+    const userMessage = {
+      type: 'user',
+      text: option,
+      timestamp: new Date()
+    };
+    setMessages([userMessage]);
+    setConversationStarted(true);
+    setIsProcessing(true);
+
+    sendToChatGPT(option);
+  };
+  
   const handleNext = () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
@@ -57,6 +133,7 @@ function ChatScreen() {
       setDebugInfo('');
       setRecordingTime(0);
       setAudioURL(null);
+      setConversationStarted(false);
     } else {
       navigate('/thank-you');
     }
@@ -84,8 +161,8 @@ function ChatScreen() {
           sampleRate: 48000,
           channelCount: 1,
           echoCancellation: true,
-          noiseSuppression: false, // Disable to preserve full audio
-          autoGainControl: false // Disable to preserve volume
+          noiseSuppression: false,
+          autoGainControl: false
         } 
       });
       
@@ -156,7 +233,6 @@ function ChatScreen() {
 
   const processAudio = async (audioBlob) => {
     try {
-      // Convert to WAV
       const arrayBuffer = await audioBlob.arrayBuffer();
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
       const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
@@ -164,7 +240,6 @@ function ChatScreen() {
       const wavBlob = audioBufferToWav(audioBuffer);
       lastBlobRef.current = wavBlob;
       
-      // Create URL for playback
       const url = URL.createObjectURL(wavBlob);
       setAudioURL(url);
       
@@ -188,17 +263,15 @@ function ChatScreen() {
   };
 
   const audioBufferToWav = (audioBuffer) => {
-    const numChannels = 1; // Force mono
+    const numChannels = 1;
     const sampleRate = audioBuffer.sampleRate;
     const format = 1;
     const bitDepth = 16;
     
-    // Get channel data and convert to mono if needed
     let channelData;
     if (audioBuffer.numberOfChannels === 1) {
       channelData = audioBuffer.getChannelData(0);
     } else {
-      // Mix down to mono
       const left = audioBuffer.getChannelData(0);
       const right = audioBuffer.getChannelData(1);
       channelData = new Float32Array(audioBuffer.length);
@@ -304,24 +377,13 @@ function ChatScreen() {
     try {
       const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
       
-      // Build conversation history for context
-      const conversationHistory = messages.map(msg => ({
-        role: msg.type === 'user' ? 'user' : 'assistant',
-        content: msg.text
-      }));
-      
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'system',
-              content: `You are Echo, a friendly and approachable AI assistant having a natural conversation with visitors at the Futurium Museum about Agri-PV technology (the combination of agriculture and solar panels).
+      // Build conversation history with system message and all messages
+      const conversationHistory = [
+        {
+          role: 'system',
+          content: `You are Echo, a friendly and approachable AI assistant having a natural conversation with visitors at the Futurium Museum about Agri-PV technology (the combination of agriculture and solar panels).
+
+The current question being discussed is: "${currentQuestion.question}"
 
 Conversation rules you must always follow:
 
@@ -332,7 +394,7 @@ Conversation rules you must always follow:
 
 2. In your FIRST response:
    - Do NOT explain Agri-PV in detail unless the user explicitly asks for an explanation.
-   - Ask a short follow-up question (maximum 2 sentences) to understand the user’s reason, opinion, or curiosity.
+   - Ask a short follow-up question (maximum 2 sentences) to understand the user's reason, opinion, or curiosity.
    - Example: ask why they like it, why they are skeptical, or what part they want explained.
 
 3. In the NEXT turn:
@@ -345,15 +407,33 @@ Conversation rules you must always follow:
 
 4. Keep responses concise, conversational, and easy to understand.
 5. Never use more than 3 sentences total in any response.
-6. Stay focused only on Agri-PV and its benefits, challenges, or real-world use.
-`
-            },
-            ...conversationHistory,
-            {
-              role: 'user',
-              content: userText
-            }
-          ],
+6. Stay focused only on Agri-PV and its benefits, challenges, or real-world use.`
+        }
+      ];
+
+      // Add all previous messages
+      messages.forEach(msg => {
+        conversationHistory.push({
+          role: msg.type === 'user' ? 'user' : 'assistant',
+          content: msg.text
+        });
+      });
+
+      // Add current user message
+      conversationHistory.push({
+        role: 'user',
+        content: userText
+      });
+      
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-3.5-turbo',
+          messages: conversationHistory,
           max_tokens: 100,
           temperature: 0.7
         })
@@ -371,6 +451,7 @@ Conversation rules you must always follow:
       setIsProcessing(false);
       
     } catch (error) {
+      console.error('❌ ChatGPT error:', error);
       const botMessage = {
         type: 'bot',
         text: "Thank you for sharing your thoughts!",
@@ -382,9 +463,10 @@ Conversation rules you must always follow:
   };
 
   return (
-    <div className="chat-container">
+    <div className={`chat-container ${!conversationStarted ? 'initial-state' : ''}`}>
+      {/* Header */}
       <div className="chat-header">
-        <h1 className="chat-title">{currentQuestion}</h1>
+        <h1 className="chat-title">{currentQuestion.question}</h1>
       </div>
 
       {showTest && (
@@ -451,80 +533,108 @@ Conversation rules you must always follow:
         </div>
       )}
 
-      <div className="messages-container">
-        {messages.map((message, index) => (
-          <div
-            key={index}
-            className={`message-wrapper ${message.type === 'user' ? 'user-message-wrapper' : 'bot-message-wrapper'}`}
-          >
-            <div className={`avatar ${message.type === 'user' ? 'user-avatar' : 'bot-avatar'}`}>
-              {message.type === 'user' ? (
-                <div className="avatar-icon user-icon">
-                  <div className="user-head"></div>
-                  <div className="user-body"></div>
-                </div>
-              ) : (
-                <div className="avatar-icon bot-icon">
-                  <div className="bot-head">
-                    <div className="bot-antenna"></div>
-                    <div className="bot-face">🤖</div>
+      {/* Default options if conversation hasn't started yet */}
+      {!conversationStarted && (
+        <div className="options-container">
+          <div className="options-buttons">
+            {currentQuestion.options.map((option, index) => (
+              <button
+                key={index}
+                className="option-button"
+                onClick={() => handleOptionSelect(option)}
+                disabled={isProcessing}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Messages Area */}
+      {conversationStarted && (
+        <div className="messages-container">
+          {messages.map((message, index) => (
+            <div
+              key={index}
+              className={`message-wrapper ${message.type === 'user' ? 'user-message-wrapper' : 'bot-message-wrapper'}`}
+            >
+              <div className={`avatar ${message.type === 'user' ? 'user-avatar' : 'bot-avatar'}`}>
+                {message.type === 'user' ? (
+                  <div className="avatar-icon user-icon">
+                    <div className="user-head"></div>
+                    <div className="user-body"></div>
                   </div>
-                </div>
-              )}
-            </div>
+                ) : (
+                  <div className="avatar-icon bot-icon">
+                    <div className="bot-head">
+                      <div className="bot-antenna"></div>
+                      <div className="bot-face">🤖</div>
+                    </div>
+                  </div>
+                )}
+              </div>
 
-            <div className={`message-bubble ${message.type === 'user' ? 'user-bubble' : 'bot-bubble'}`}>
-              {message.type === 'bot' && (
-                <div className="waveform">
-                  <div className="wave-bar"></div>
-                  <div className="wave-bar"></div>
-                  <div className="wave-bar"></div>
-                  <div className="wave-bar"></div>
-                  <div className="wave-bar"></div>
-                </div>
-              )}
-              <p className="message-text">{message.text}</p>
+              <div className={`message-bubble ${message.type === 'user' ? 'user-bubble' : 'bot-bubble'}`}>
+                {message.type === 'bot' && (
+                  <div className="waveform">
+                    <div className="wave-bar"></div>
+                    <div className="wave-bar"></div>
+                    <div className="wave-bar"></div>
+                    <div className="wave-bar"></div>
+                    <div className="wave-bar"></div>
+                  </div>
+                )}
+                <p className="message-text">{message.text}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
 
-        {isProcessing && !showTest && (
-          <div className="processing-indicator">
-            <div className="typing-dots">
-              <span></span>
-              <span></span>
-              <span></span>
+          {isProcessing && !showTest && (
+            <div className="processing-indicator">
+              <div className="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
             </div>
-          </div>
-        )}
-
-        <div ref={messagesEndRef} />
-      </div>
-
-      <div className="recording-section">
-        <button
-          className={`record-button ${isRecording ? 'recording' : ''}`}
-          onClick={isRecording ? stopRecording : startRecording}
-          disabled={isProcessing && !showTest}
-        >
-          {isRecording ? (
-            <div className="button-waveform">
-              <div className="button-wave-bar"></div>
-              <div className="button-wave-bar"></div>
-              <div className="button-wave-bar"></div>
-              <div className="button-wave-bar"></div>
-              <div className="button-wave-bar"></div>
-            </div>
-          ) : (
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
-              <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
-              <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-            </svg>
           )}
-        </button>
-      </div>
 
-      <button className="next-button" onClick={handleNext}>
+          <div ref={messagesEndRef} />
+        </div>
+      )}
+
+      {/* Recording Button */}
+      {conversationStarted && (
+        <div className="recording-section">
+          <button
+            className={`record-button ${isRecording ? 'recording' : ''}`}
+            onClick={isRecording ? stopRecording : startRecording}
+            disabled={isProcessing && !showTest}
+          >
+            {isRecording ? (
+              <div className="button-waveform">
+                <div className="button-wave-bar"></div>
+                <div className="button-wave-bar"></div>
+                <div className="button-wave-bar"></div>
+                <div className="button-wave-bar"></div>
+                <div className="button-wave-bar"></div>
+              </div>
+            ) : (
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
+                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+              </svg>
+            )}
+          </button>
+        </div>
+      )}
+
+      {/* Next Button */}
+      <button 
+        className="next-button"
+        onClick={handleNext}
+      >
         Next →
       </button>
     </div>
