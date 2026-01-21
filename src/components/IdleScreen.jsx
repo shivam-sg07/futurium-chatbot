@@ -6,7 +6,7 @@ function IdleScreen() {
   const iframeRef = useRef(null);
 
   const handleGetStarted = () => {
-    navigate('/get-started');
+    navigate('/chat');
   };
 
   return (
