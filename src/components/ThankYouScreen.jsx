@@ -1,9 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ThankYouScreen.css';
 
 function ThankYouScreen() {
   const navigate = useNavigate();
+  const [countdown, setCountdown] = useState(10);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          navigate('/');
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [navigate]);
 
   const handleRestart = () => {
     navigate('/');
@@ -37,7 +52,7 @@ function ThankYouScreen() {
           className="restart-button"
           onClick={handleRestart}
         >
-          Back to Home
+          Returning back to home screen in {countdown} seconds...
         </button>
       </div>
     </div>

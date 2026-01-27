@@ -122,17 +122,17 @@ html, body {
   bottom: 30px;
   right: 30px;
   padding: 12px 24px;
-  background: #000000;
+  background: #0c4089;
   color: white;
   border: none;
   border-radius: 25px;
-  font-size: 16px;
+  font-size: 20px;
   cursor: pointer;
   z-index: 10;
 }
 
 .next-button:hover {
-  background: #333333;
+  background: #0c4089;
 }
 /* ===== AVATARS ===== */
 .avatar {
@@ -299,12 +299,12 @@ html, body {
 
 .record-button {
   position: relative;
-  background: linear-gradient(135deg, #ff8343 0%, #eb9f48 100%);
+  background: linear-gradient(135deg, #0c7489 0%, #0c7489 100%);
   color: white;
   border: none;
   border-radius: 50%;
-  width: 70px;
-  height: 70px;
+  width: 95px;
+  height: 95px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -328,8 +328,33 @@ html, body {
 }
 
 .record-button.recording {
-  background: linear-gradient(135deg, #ff8343 0%, #eb9f48 100%);
+  background: linear-gradient(135deg, #0c7489 0%, #0c7489 100%);
   animation: pulse-btn 1.5s ease-in-out infinite;
+}
+.record-button.recording::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid #0c7489;
+  animation: pulse-ring 1.5s ease-out infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+  }
+  100% {
+    width: 150%;
+    height: 150%;
+    opacity: 0;
+  }
 }
 
 @keyframes pulse-btn {
@@ -367,12 +392,12 @@ html, body {
   align-items: center;
   justify-content: center;
   padding: 1rem 1.3rem;
-  background: linear-gradient(135deg, #ff8343 0%, #eb9f48 100%);
+  background: linear-gradient(135deg, #0c7489 0%, #0c7489 100%);
   color: white;
   border: none;
   border-radius: 40px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 1.3rem;
   font-weight: 600;
   font-family: 'FuturiumType', sans-serif;
   transition: all 0.3s ease;
@@ -383,7 +408,7 @@ html, body {
 
 .option-button:hover {
   transform: translateY(-3px);
-  box-shadow: 0 0 10px 10px rgba(255, 131, 67, 0.7);
+  box-shadow: 0 0 10px 10px #0a5f73;
 }
 
 .option-button:active {
@@ -477,8 +502,8 @@ html, body {
   }
 
   .record-button {
-    width: 65px;
-    height: 65px;
+    width: 75px;
+    height: 75px;
   }
 }
 

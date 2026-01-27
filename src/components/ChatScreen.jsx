@@ -11,14 +11,7 @@ const questions = [
       "Could you explain Agri-PV?"
     ]
   },
-  {
-    question: "WOULD YOU LIKE TO SEE AGRI-PV IN YOUR REGION?",
-    options: [
-      "Yes, definitely!",
-      "Not sure yet!",
-      "Could you provide facts about Agri-PV?"
-    ]
-  },
+
   {
     question: "DO YOU THINK AGRI-PV IS GOOD FOR FARMERS?",
     options: [
@@ -27,14 +20,7 @@ const questions = [
       "Could you explain Agri-PV?"
     ]
   },
-  {
-    question: "WOULD YOU SUPPORT AGRI-PV ON FARMLAND YOU KNOW?",
-    options: [
-      "Yes, definitely!",
-      "I am skeptical!",
-      "Could you explain Agri-PV?"
-    ]
-  },
+
   {
     question: "WHAT BENEFITS DO YOU SEE IN COMBINING AGRICULTURE WITH SOLAR?",
     options: [
@@ -43,22 +29,7 @@ const questions = [
       "Could you explain Agri-PV?"
     ]
   },
-  {
-    question: "HOW DO YOU FEEL ABOUT MIXING FARMING AND SOLAR PANELS?",
-    options: [
-      "I really like the idea!",
-      "I am skeptical!",
-      "Could you explain Agri-PV?"
-    ]
-  },
-  {
-    question: "WHAT WORRIES YOU ABOUT AGRI-PV?",
-    options: [
-      "Nothing!",
-      "Quite a lot!",
-      "Could you explain Agri-PV?"
-    ]
-  },
+
   {
     question: "WHAT SURPRISED YOU IN THIS EXHIBIT AND SIMULATIONS?",
     options: [
@@ -67,6 +38,7 @@ const questions = [
       "Could you explain Agri-PV?"
     ]
   },
+
   {
     question: "WHAT PART OF THIS DISPLAY INTERESTS YOU THE MOST?",
     options: [
@@ -82,10 +54,7 @@ function ChatScreen() {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [questionIndex, setQuestionIndex] = useState(0);
-  const [debugInfo, setDebugInfo] = useState('');
-  const [recordingTime, setRecordingTime] = useState(0);
-  const [audioURL, setAudioURL] = useState(null);
-  const [showTest, setShowTest] = useState(false); // Changed to false by default
+
   const [conversationStarted, setConversationStarted] = useState(false);
   const navigate = useNavigate();
   
@@ -93,7 +62,7 @@ function ChatScreen() {
   const streamRef = useRef(null);
   const messagesEndRef = useRef(null);
   const timerRef = useRef(null);
-  const lastBlobRef = useRef(null);
+
 
   const currentQuestion = questions[questionIndex];
 
@@ -130,31 +99,15 @@ function ChatScreen() {
     if (questionIndex < questions.length - 1) {
       setQuestionIndex(questionIndex + 1);
       setMessages([]);
-      setDebugInfo('');
-      setRecordingTime(0);
-      setAudioURL(null);
       setConversationStarted(false);
     } else {
       navigate('/thank-you');
     }
   };
 
-  const downloadAudio = () => {
-    if (lastBlobRef.current) {
-      const url = URL.createObjectURL(lastBlobRef.current);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'recording.wav';
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-  };
-
   const startRecording = async () => {
     try {
-      console.log('🎤 === STARTING RECORDING ===');
-      setDebugInfo('🎤 Requesting microphone...');
-      setAudioURL(null);
+      console.log('🎤 Starting recording...');
       
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
@@ -167,7 +120,6 @@ function ChatScreen() {
       });
       
       streamRef.current = stream;
-      console.log('✅ Microphone obtained');
       
       const recorder = new MediaRecorder(stream, {
         mimeType: 'audio/webm',
@@ -184,45 +136,29 @@ function ChatScreen() {
       };
       
       recorder.onstop = async () => {
-        console.log('🛑 Recording stopped');
-        
         if (chunks.length === 0) {
-          setDebugInfo('❌ No audio captured');
+          console.error('No audio captured');
           setIsProcessing(false);
           return;
         }
         
         const blob = new Blob(chunks, { type: 'audio/webm' });
-        console.log('📦 Original blob:', blob.size, 'bytes');
-        
         await processAudio(blob);
       };
       
       recorder.start(100);
       setIsRecording(true);
-      setRecordingTime(0);
-      setDebugInfo('🔴 Recording...');
-      
-      let seconds = 0;
-      timerRef.current = setInterval(() => {
-        seconds++;
-        setRecordingTime(seconds);
-      }, 1000);
       
     } catch (error) {
-      console.error('❌ Failed:', error);
-      setDebugInfo('❌ Error: ' + error.message);
+      console.error('Recording error:', error);
       setIsRecording(false);
     }
   };
 
   const stopRecording = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    
     if (recorderRef.current && recorderRef.current.state !== 'inactive') {
       recorderRef.current.stop();
       setIsRecording(false);
-      setDebugInfo('🔄 Processing...');
       setIsProcessing(true);
     }
     
@@ -238,26 +174,12 @@ function ChatScreen() {
       const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
       
       const wavBlob = audioBufferToWav(audioBuffer);
-      lastBlobRef.current = wavBlob;
-      
-      const url = URL.createObjectURL(wavBlob);
-      setAudioURL(url);
-      
-      console.log('📦 WAV created:', wavBlob.size, 'bytes');
-      console.log('Duration:', audioBuffer.duration, 'seconds');
-      
       audioContext.close();
       
-      if (showTest) {
-        setDebugInfo('✅ Recording complete! Listen to it below.');
-        setIsProcessing(false);
-      } else {
-        await transcribeAudio(wavBlob);
-      }
+      await transcribeAudio(wavBlob);
       
     } catch (error) {
-      console.error('❌ Processing error:', error);
-      setDebugInfo('❌ Error: ' + error.message);
+      console.error('Processing error:', error);
       setIsProcessing(false);
     }
   };
@@ -322,8 +244,6 @@ function ChatScreen() {
         throw new Error('Invalid API key');
       }
 
-      console.log('🚀 Sending to Whisper...');
-      
       const audioFile = new File([wavBlob], 'recording.wav', { type: 'audio/wav' });
       
       const formData = new FormData();
@@ -341,18 +261,16 @@ function ChatScreen() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
         throw new Error(`Whisper failed: ${response.status}`);
       }
 
       const data = await response.json();
       const transcript = data.text.trim();
       
-      console.log('✅ Transcript:', transcript);
-      setDebugInfo('');
+      console.log('Transcript:', transcript);
 
       if (!transcript) {
-        setDebugInfo('⚠️ No speech detected');
+        console.warn('No speech detected');
         setIsProcessing(false);
         return;
       }
@@ -367,8 +285,7 @@ function ChatScreen() {
       await sendToChatGPT(transcript);
 
     } catch (error) {
-      console.error('❌ Error:', error);
-      setDebugInfo('❌ Error: ' + error.message);
+      console.error('Transcription error:', error);
       setIsProcessing(false);
     }
   };
@@ -377,7 +294,6 @@ function ChatScreen() {
     try {
       const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
       
-      // Build conversation history with system message and all messages
       const conversationHistory = [
         {
           role: 'system',
@@ -411,7 +327,6 @@ Conversation rules you must always follow:
         }
       ];
 
-      // Add all previous messages
       messages.forEach(msg => {
         conversationHistory.push({
           role: msg.type === 'user' ? 'user' : 'assistant',
@@ -419,7 +334,6 @@ Conversation rules you must always follow:
         });
       });
 
-      // Add current user message
       conversationHistory.push({
         role: 'user',
         content: userText
@@ -451,7 +365,7 @@ Conversation rules you must always follow:
       setIsProcessing(false);
       
     } catch (error) {
-      console.error('❌ ChatGPT error:', error);
+      console.error('ChatGPT error:', error);
       const botMessage = {
         type: 'bot',
         text: "Thank you for sharing your thoughts!",
@@ -468,70 +382,6 @@ Conversation rules you must always follow:
       <div className="chat-header">
         <h1 className="chat-title">{currentQuestion.question}</h1>
       </div>
-
-      {showTest && (
-        <div style={{
-          padding: '15px 20px',
-          background: '#fff3e0',
-          color: '#ef6c00',
-          textAlign: 'center',
-          fontSize: '14px',
-          fontWeight: 'bold'
-        }}>
-          🧪 TEST MODE: Record, then listen to verify audio quality
-          <button onClick={() => setShowTest(false)} style={{marginLeft: '20px', padding: '5px 15px'}}>
-            Disable Test Mode
-          </button>
-        </div>
-      )}
-
-      {debugInfo && (
-        <div style={{
-          padding: '15px 20px',
-          background: debugInfo.includes('❌') ? '#ffebee' : debugInfo.includes('⚠️') ? '#fff3e0' : debugInfo.includes('🔴') ? '#ffcdd2' : '#e8f5e9',
-          color: debugInfo.includes('❌') ? '#c62828' : debugInfo.includes('⚠️') ? '#ef6c00' : debugInfo.includes('🔴') ? '#c62828' : '#2e7d32',
-          textAlign: 'center',
-          fontSize: '18px',
-          fontWeight: 'bold'
-        }}>
-          {debugInfo}
-        </div>
-      )}
-
-      {isRecording && (
-        <div style={{
-          padding: '25px',
-          background: 'linear-gradient(135deg, #ff1744 0%, #f50057 100%)',
-          color: 'white',
-          textAlign: 'center',
-          fontSize: '40px',
-          fontWeight: 'bold'
-        }}>
-          🔴 RECORDING: {recordingTime}s
-        </div>
-      )}
-
-      {audioURL && showTest && (
-        <div style={{
-          padding: '20px',
-          background: '#e3f2fd',
-          textAlign: 'center'
-        }}>
-          <h3>🎧 Listen to your recording:</h3>
-          <audio controls src={audioURL} style={{width: '80%', marginBottom: '10px'}} />
-          <div>
-            <button onClick={downloadAudio} style={{padding: '10px 20px', marginRight: '10px', fontSize: '16px'}}>
-              Download WAV
-            </button>
-            <button onClick={() => transcribeAudio(lastBlobRef.current)} style={{padding: '10px 20px', fontSize: '16px', background: '#4CAF50', color: 'white', border: 'none', borderRadius: '5px'}}>
-              Send to Whisper
-            </button>
-          </div>
-          <p style={{marginTop: '10px', fontSize: '14px'}}>
-            Can you hear your voice clearly? If yes, click "Send to Whisper"
-          </p>
-        </div>
-      )}
 
       {/* Default options if conversation hasn't started yet */}
       {!conversationStarted && (
@@ -576,21 +426,13 @@ Conversation rules you must always follow:
               </div>
 
               <div className={`message-bubble ${message.type === 'user' ? 'user-bubble' : 'bot-bubble'}`}>
-                {message.type === 'bot' && (
-                  <div className="waveform">
-                    <div className="wave-bar"></div>
-                    <div className="wave-bar"></div>
-                    <div className="wave-bar"></div>
-                    <div className="wave-bar"></div>
-                    <div className="wave-bar"></div>
-                  </div>
-                )}
+                
                 <p className="message-text">{message.text}</p>
               </div>
             </div>
           ))}
 
-          {isProcessing && !showTest && (
+          {isProcessing && (
             <div className="processing-indicator">
               <div className="typing-dots">
                 <span></span>
@@ -610,7 +452,7 @@ Conversation rules you must always follow:
           <button
             className={`record-button ${isRecording ? 'recording' : ''}`}
             onClick={isRecording ? stopRecording : startRecording}
-            disabled={isProcessing && !showTest}
+            disabled={isProcessing}
           >
             {isRecording ? (
               <div className="button-waveform">

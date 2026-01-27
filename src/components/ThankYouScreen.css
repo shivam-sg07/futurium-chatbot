@@ -5,7 +5,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #17b9b2;
+  background: #0c2a30;
   font-family: 'Arial', 'Helvetica', sans-serif;
   overflow: hidden;
   position: relative;
@@ -65,24 +65,24 @@
 /* ===== TITLE ===== */
 .thankyou-title {
   font-family: 'FuturiumType', Arial, sans-serif;
-  font-size: 56px;
+  font-size: 86px;
   font-weight: 700;
-  color: #000000;
+  color: #ffffff;
   margin: 0 0 20px 0;
   animation: fadeInUp 0.6s ease-out 0.2s both;
 }
 
 /* ===== MESSAGES ===== */
 .thankyou-message {
-  font-size: 20px;
-  color: #000000;
+  font-size: 30px;
+  color: #ffffff;
   line-height: 1.6;
   margin: 0 0 30px 0;
   animation: fadeInUp 0.6s ease-out 0.4s both;
 }
 
 .thankyou-divider {
-  width: 80px;
+  width: 150px;
   height: 3px;
   background: #E7F669;
   margin: 0 auto 30px auto;
@@ -90,8 +90,8 @@
 }
 
 .thankyou-submessage {
-  font-size: 16px;
-  color: rgba(0, 0, 0, 0.7);
+  font-size: 22px;
+  color: rgba(255, 255, 255, 0.8);
   line-height: 1.6;
   margin: 0 0 40px 0;
   animation: fadeInUp 0.6s ease-out 0.6s both;
