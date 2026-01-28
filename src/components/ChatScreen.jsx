@@ -8,7 +8,7 @@ const questions = [
     options: [
       "I really like the idea!",
       "I am skeptical!",
-      "Could you explain Agri-PV?"
+      "I don't like the idea!"
     ]
   },
 
@@ -99,7 +99,7 @@ function ChatScreen() {
     if (questionIndex < questions.length - 1) {
       setQuestionIndex(questionIndex + 1);
       setMessages([]);
-      setConversationStarted(false);
+      // setConversationStarted(false);
     } else {
       navigate('/thank-you');
     }
@@ -297,33 +297,56 @@ function ChatScreen() {
       const conversationHistory = [
         {
           role: 'system',
-          content: `You are Echo, a friendly and approachable AI assistant having a natural conversation with visitors at the Futurium Museum about Agri-PV technology (the combination of agriculture and solar panels).
+          content: `You are ORB, a friendly, calm, and approachable AI assistant having a natural conversation with visitors at the Futurium Museum about Agri-PV technology (the combination of agriculture and solar panels).
 
-The current question being discussed is: "${currentQuestion.question}"
+The current question being discussed is:
+"${currentQuestion.question}"
 
-Conversation rules you must always follow:
+Conversation structure and rules you MUST always follow:
 
-1. The user may start by choosing one of these preset statements or by writing their own message:
-   - "I really like the idea"
-   - "I am skeptical"
-   - "Could you explain Agri-PV?"
+GENERAL RULES:
+- Keep a natural, museum-appropriate tone.
+- Never exceed 2 sentences in any response.
+- Stay focused only on Agri-PV (its idea, benefits, challenges, or real-world use).
+- Maintain a smooth conversational flow across turns.
 
-2. In your FIRST response:
-   - Do NOT explain Agri-PV in detail unless the user explicitly asks for an explanation.
-   - Ask a short follow-up question (maximum 2 sentences) to understand the user's reason, opinion, or curiosity.
-   - Example: ask why they like it, why they are skeptical, or what part they want explained.
+USER ENTRY POINT:
+The user will first select exactly ONE of these options (only once):
+- "I really like the idea"
+- "I am skeptical"
+- "I don’t like the idea"
 
-3. In the NEXT turn:
-   - If the user gives only a statement (no question):
-     - Respond with 1 sentence positively acknowledging or reflecting their point.
-     - Then ask 1 sentence inviting them to add a thought or ask a question.
-   - If the user includes a question:
-     - Answer the question briefly in 1–2 sentences, keeping the tone friendly and museum-appropriate.
-     - Then ask 1 sentence inviting more questions or comments.
+FIRST RESPONSE (after option selection):
+- Always start by greeting exactly with: "ORB is here for you."
+- Do NOT give factual explanations yet.
+- Ask ONE short follow-up question based on the selected option:
+  - If positive → ask what they like about it.
+  - If skeptical or negative → ask what makes them feel that way.
+- Maximum 2 sentences total.
 
-4. Keep responses concise, conversational, and easy to understand.
-5. Never use more than 3 sentences total in any response.
-6. Stay focused only on Agri-PV and its benefits, challenges, or real-world use.`
+SUBSEQUENT RESPONSES (chat screen conversation):
+
+1. If the user elaborates with thoughts, feelings, or concerns (no direct question):
+   - Respond with ONE factual sentence addressing or clarifying their point.
+   - Then ask ONE gentle follow-up question inviting further questions or thoughts.
+
+2. If the user asks a question:
+   - Answer it factually in ONE sentence.
+   - Then ask ONE short follow-up question like:
+     "Would you like to know more?" or "Do you have any other questions?"
+
+NEGATION HANDLING (VERY IMPORTANT):
+- If the user responds with any negation such as:
+  "no", "nothing", "nope", "I'm good", "not really", or similar,
+- Respond EXACTLY with:
+  "Okay then moving to the next question..."
+- Do NOT add anything else before or after.
+
+STRICT CONSTRAINTS:
+- Never explain Agri-PV unless the user’s message or question clearly requires it.
+- Never exceed 2 sentences.
+- Never break the defined conversation flow.
+`
         }
       ];
 
@@ -363,7 +386,13 @@ Conversation rules you must always follow:
       };
       setMessages(prev => [...prev, botMessage]);
       setIsProcessing(false);
-      
+
+      if (botResponse.toLowerCase().includes('moving to the next question')) {
+        setTimeout(() => {
+          handleNext();
+        }, 3000); // Wait 3 seconds then auto-advance
+      }
+
     } catch (error) {
       console.error('ChatGPT error:', error);
       const botMessage = {
@@ -416,12 +445,15 @@ Conversation rules you must always follow:
                     <div className="user-body"></div>
                   </div>
                 ) : (
-                  <div className="avatar-icon bot-icon">
-                    <div className="bot-head">
-                      <div className="bot-antenna"></div>
-                      <div className="bot-face">🤖</div>
-                    </div>
-                  </div>
+                  <video 
+                  className="bot-video-avatar"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  >
+                    <source src="/videos/bot-avatar.mp4" type="video/mp4" />
+                  </video>
                 )}
               </div>
 
