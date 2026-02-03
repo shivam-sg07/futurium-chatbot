@@ -13,24 +13,6 @@ const questions = [
   },
 
   {
-    question: "DO YOU THINK AGRI-PV IS GOOD FOR FARMERS?",
-    options: [
-      "Yes, definitely!",
-      "Not sure yet!",
-      "Could you explain Agri-PV?"
-    ]
-  },
-
-  {
-    question: "WHAT BENEFITS DO YOU SEE IN COMBINING AGRICULTURE WITH SOLAR?",
-    options: [
-      "Many!",
-      "Not a lot!",
-      "Could you explain Agri-PV?"
-    ]
-  },
-
-  {
     question: "WHAT SURPRISED YOU IN THIS EXHIBIT AND SIMULATIONS?",
     options: [
       "Nothing!",
@@ -317,7 +299,7 @@ The user will first select exactly ONE of these options (only once):
 - "I don’t like the idea"
 
 FIRST RESPONSE (after option selection):
-- Always start by greeting exactly with: "ORB is here for you."
+- Acknowledge the selected option positively or empathetically.
 - Do NOT give factual explanations yet.
 - Ask ONE short follow-up question based on the selected option:
   - If positive → ask what they like about it.
@@ -339,7 +321,7 @@ NEGATION HANDLING (VERY IMPORTANT):
 - If the user responds with any negation such as:
   "no", "nothing", "nope", "I'm good", "not really", or similar,
 - Respond EXACTLY with:
-  "Okay then moving to the next question..."
+  "Okay then moving ahead..."
 - Do NOT add anything else before or after.
 
 STRICT CONSTRAINTS:
@@ -387,7 +369,7 @@ STRICT CONSTRAINTS:
       setMessages(prev => [...prev, botMessage]);
       setIsProcessing(false);
 
-      if (botResponse.toLowerCase().includes('moving to the next question')) {
+      if (botResponse.toLowerCase().includes('then moving ahead')) {
         setTimeout(() => {
           handleNext();
         }, 3000); // Wait 3 seconds then auto-advance

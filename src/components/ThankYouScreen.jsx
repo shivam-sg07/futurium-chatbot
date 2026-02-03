@@ -4,7 +4,7 @@ import './ThankYouScreen.css';
 
 function ThankYouScreen() {
   const navigate = useNavigate();
-  const [countdown, setCountdown] = useState(10);
+  const [countdown, setCountdown] = useState(6);
 
   useEffect(() => {
     const timer = setInterval(() => {

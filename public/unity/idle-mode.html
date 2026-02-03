@@ -1,177 +1,186 @@
 <!DOCTYPE html>
 <html lang="en-us">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Unity Web Player | Chatbot</title>
-    <link rel="shortcut icon" href="TemplateData/favicon.ico">
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Unity Web Player | Chatbot</title>
+<link rel="shortcut icon" href="TemplateData/favicon.ico">
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-      html, body {
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        background: #231F20;
-      }
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
 
-      #unity-container {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-      }
+  body {
+    background: #0c2a30;
+  }
 
-      #unity-canvas {
-        width: 100%;
-        height: 100%;
-        display: block;
-        background: #231F20;
-      }
+  #unity-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+  }
 
-      #unity-loading-bar {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        display: none;
-      }
+  #unity-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: #231F20;
+    cursor: pointer;
+  }
 
-      #unity-logo {
-        width: 154px;
-        height: 130px;
-        background: url('TemplateData/unity-logo-dark.png') no-repeat center;
-        background-size: contain;
-      }
+  #unity-loading-bar {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+  }
 
-      #unity-progress-bar-empty {
-        width: 141px;
-        height: 18px;
-        margin-top: 10px;
-        margin-left: 6.5px;
-        background: url('TemplateData/progress-bar-empty-dark.png') no-repeat center;
-        background-size: contain;
-      }
+  #unity-logo {
+    width: 154px;
+    height: 130px;
+    background: url('TemplateData/unity-logo-dark.png') no-repeat center;
+    background-size: contain;
+  }
 
-      #unity-progress-bar-full {
-        width: 0%;
-        height: 18px;
-        background: url('TemplateData/progress-bar-full-dark.png') no-repeat center;
-        background-size: contain;
-      }
+  #unity-progress-bar-empty {
+    width: 141px;
+    height: 18px;
+    margin-top: 10px;
+    margin-left: 6.5px;
+    background: url('TemplateData/progress-bar-empty-dark.png') no-repeat center;
+    background-size: contain;
+  }
 
-      #unity-warning {
-        position: absolute;
-        left: 50%;
-        top: 5%;
-        transform: translateX(-50%);
-        background: white;
-        padding: 10px;
-        display: none;
-        z-index: 1000;
-      }
+  #unity-progress-bar-full {
+    width: 0%;
+    height: 18px;
+    background: url('TemplateData/progress-bar-full-dark.png') no-repeat center;
+    background-size: contain;
+  }
 
-      #unity-footer {
-        display: none; /* Hide footer for fullscreen mode */
-      }
+  #unity-warning {
+    position: absolute;
+    left: 50%;
+    top: 5%;
+    transform: translateX(-50%);
+    background: white;
+    padding: 10px;
+    display: none;
+    max-width: 80%;
+    z-index: 1000;
+  }
 
-      /* Optional: Show fullscreen button */
-      #unity-fullscreen-button {
-        position: absolute;
-        right: 20px;
-        bottom: 20px;
-        width: 38px;
-        height: 38px;
-        background: url('TemplateData/fullscreen-button.png') no-repeat center;
-        background-size: contain;
-        cursor: pointer;
-        z-index: 1000;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="unity-container">
-      <canvas id="unity-canvas" tabindex="-1"></canvas>
-      <div id="unity-loading-bar">
-        <div id="unity-logo"></div>
-        <div id="unity-progress-bar-empty">
-          <div id="unity-progress-bar-full"></div>
-        </div>
-      </div>
-      <div id="unity-warning"></div>
-      <!-- Uncomment if you want fullscreen button visible -->
-      <!-- <div id="unity-fullscreen-button"></div> -->
+  #unity-container {
+  transition: opacity 0.5s ease-out;
+}
+
+#unity-container.fade-out {
+  opacity: 0;
+}
+
+</style>
+</head>
+<body>
+<div id="unity-container">
+  <canvas id="unity-canvas" tabindex="-1"></canvas>
+  <div id="unity-loading-bar">
+    <div id="unity-logo"></div>
+    <div id="unity-progress-bar-empty">
+      <div id="unity-progress-bar-full"></div>
     </div>
-    <script>
-      var canvas = document.querySelector("#unity-canvas");
-      
+  </div>
+  <div id="unity-warning"></div>
+</div>
 
-      function unityShowBanner(msg, type) {
-        var warningBanner = document.querySelector("#unity-warning");
-        function updateBannerVisibility() {
-          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
-        }
-        var div = document.createElement('div');
-        div.innerHTML = msg;
-        warningBanner.appendChild(div);
-        if (type == 'error') div.style = 'background: red; padding: 10px;';
-        else {
-          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
-          setTimeout(function() {
-            warningBanner.removeChild(div);
-            updateBannerVisibility();
-          }, 5000);
-        }
+<script>
+  var canvas = document.querySelector("#unity-canvas");
+  var hasClicked = false;
+  
+  function unityShowBanner(msg, type) {
+    var warningBanner = document.querySelector("#unity-warning");
+    function updateBannerVisibility() {
+      warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+    }
+    var div = document.createElement('div');
+    div.innerHTML = msg;
+    warningBanner.appendChild(div);
+    if (type == 'error') div.style = 'background: red; padding: 10px;';
+    else {
+      if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+      setTimeout(function() {
+        warningBanner.removeChild(div);
         updateBannerVisibility();
-      }
+      }, 5000);
+    }
+    updateBannerVisibility();
+  }
 
-      var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/Web5.loader.js";
-      var config = {
-        arguments: [],
-        dataUrl: buildUrl + "/Web5.data.unityweb",
-        frameworkUrl: buildUrl + "/Web5.framework.js.unityweb",
-        codeUrl: buildUrl + "/Web5.wasm.unityweb",
-        streamingAssetsUrl: "StreamingAssets",
-        companyName: "DefaultCompany",
-        productName: "Chatbot",
-        productVersion: "1.0",
-        showBanner: unityShowBanner,
-      };
+  var buildUrl = "Build";
+  var loaderUrl = buildUrl + "/Web6.loader.js";
+  var config = {
+    arguments: [],
+    dataUrl: buildUrl + "/Web6.data.unityweb",
+    frameworkUrl: buildUrl + "/Web6.framework.js.unityweb",
+    codeUrl: buildUrl + "/Web6.wasm.unityweb",
+    streamingAssetsUrl: "StreamingAssets",
+    companyName: "DefaultCompany",
+    productName: "Chatbot",
+    productVersion: "1.0",
+    showBanner: unityShowBanner,
+  };
 
-      // Enable canvas to match container size
-      config.matchWebGLToCanvasSize = true;
+  // Match canvas size to window size
+  config.matchWebGLToCanvasSize = true;
 
-      document.querySelector("#unity-loading-bar").style.display = "block";
+  // Handle responsive sizing
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
 
-      var script = document.createElement("script");
-      script.src = loaderUrl;
-      script.onload = () => {
-        createUnityInstance(canvas, config, (progress) => {
-          document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
-        }).then((unityInstance) => {
-          document.querySelector("#unity-loading-bar").style.display = "none";
-          
-          // Optional: Setup fullscreen button if you uncomment it in HTML
-          var fullscreenButton = document.querySelector("#unity-fullscreen-button");
-          if (fullscreenButton) {
-            fullscreenButton.onclick = () => {
-              unityInstance.SetFullscreen(1);
-            };
-          }
-        }).catch((message) => {
-          alert(message);
-        });
-      };
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
 
-      document.body.appendChild(script);
+  // Add click listener to navigate after 3.5 seconds
+canvas.addEventListener('click', function() {
+  if (!hasClicked) {
+    hasClicked = true;
+    setTimeout(function() {
+      document.getElementById('unity-container').classList.add('fade-out');
+      setTimeout(function() {
+        window.location.href = '/chat';
+      }, 500);
+    }, 3500);
+  }
+});
 
-    </script>
-  </body>
+  // Show loading bar
+  document.querySelector("#unity-loading-bar").style.display = "block";
+
+  var script = document.createElement("script");
+  script.src = loaderUrl;
+  script.onload = () => {
+    createUnityInstance(canvas, config, (progress) => {
+      document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
+    }).then((unityInstance) => {
+      document.querySelector("#unity-loading-bar").style.display = "none";
+    }).catch((message) => {
+      alert(message);
+    });
+  };
+  document.body.appendChild(script);
+</script>
+</body>
 </html>

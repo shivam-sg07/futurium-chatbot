@@ -22,6 +22,7 @@ function IdleScreen() {
         }}
         title="Idle Mode"
       />
+{/*       
       <button 
         onClick={handleGetStarted}
         style={{
@@ -41,6 +42,7 @@ function IdleScreen() {
       >
         Get Started
       </button>
+ */}
     </div>
   );
 }
