@@ -29,6 +29,11 @@
     height: 100%;
     left: 0;
     top: 0;
+    transition: opacity 0.5s ease-out;
+  }
+
+  #unity-container.fade-out {
+    opacity: 0;
   }
 
   #unity-canvas {
@@ -81,15 +86,6 @@
     max-width: 80%;
     z-index: 1000;
   }
-
-  #unity-container {
-  transition: opacity 0.5s ease-out;
-}
-
-#unity-container.fade-out {
-  opacity: 0;
-}
-
 </style>
 </head>
 <body>
@@ -128,12 +124,12 @@
   }
 
   var buildUrl = "Build";
-  var loaderUrl = buildUrl + "/Web6.loader.js";
+  var loaderUrl = buildUrl + "/Web7.loader.js";
   var config = {
     arguments: [],
-    dataUrl: buildUrl + "/Web6.data.unityweb",
-    frameworkUrl: buildUrl + "/Web6.framework.js.unityweb",
-    codeUrl: buildUrl + "/Web6.wasm.unityweb",
+    dataUrl: buildUrl + "/Web7.data.unityweb",
+    frameworkUrl: buildUrl + "/Web7.framework.js.unityweb",
+    codeUrl: buildUrl + "/Web7.wasm.unityweb",
     streamingAssetsUrl: "StreamingAssets",
     companyName: "DefaultCompany",
     productName: "Chatbot",
@@ -154,17 +150,17 @@
   resizeCanvas();
 
   // Add click listener to navigate after 3.5 seconds
-canvas.addEventListener('click', function() {
-  if (!hasClicked) {
-    hasClicked = true;
-    setTimeout(function() {
-      document.getElementById('unity-container').classList.add('fade-out');
+  canvas.addEventListener('click', function() {
+    if (!hasClicked) {
+      hasClicked = true;
       setTimeout(function() {
-        window.location.href = '/chat';
-      }, 500);
-    }, 3500);
-  }
-});
+        document.getElementById('unity-container').classList.add('fade-out');
+        setTimeout(function() {
+          window.location.href = '/chat';
+        }, 500);
+      }, 3500);
+    }
+  });
 
   // Show loading bar
   document.querySelector("#unity-loading-bar").style.display = "block";
