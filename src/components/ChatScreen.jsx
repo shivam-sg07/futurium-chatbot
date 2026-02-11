@@ -420,13 +420,7 @@ STRICT CONSTRAINTS:
               key={index}
               className={`message-wrapper ${message.type === 'user' ? 'user-message-wrapper' : 'bot-message-wrapper'}`}
             >
-              <div className={`avatar ${message.type === 'user' ? 'user-avatar' : 'bot-avatar'}`}>
-                {message.type === 'user' ? (
-                  <div className="avatar-icon user-icon">
-                    <div className="user-head"></div>
-                    <div className="user-body"></div>
-                  </div>
-                ) : (
+              {message.type === 'bot' && (
                   <video 
                   className="bot-video-avatar"
                   autoPlay
@@ -437,7 +431,6 @@ STRICT CONSTRAINTS:
                     <source src="/videos/bot-avatar.mp4" type="video/mp4" />
                   </video>
                 )}
-              </div>
 
               <div className={`message-bubble ${message.type === 'user' ? 'user-bubble' : 'bot-bubble'}`}>
                 
